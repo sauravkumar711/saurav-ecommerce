@@ -9,7 +9,7 @@ const Home = () => {
    <div className="home">
     <section></section>
     <h1>Latest Products
-        <Link to="/search" className="findmore"> More items </Link>
+        <Link to="/search" className="findmore"> More </Link>
     </h1>
     <main>
         <Productcard
