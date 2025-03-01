@@ -47,7 +47,7 @@ const Header = () => {
                 Orders
               </Link>
               <button onClick={logoutHandler}>
-                <FaSignOutAlt jj />
+                <FaSignOutAlt />
               </button>
             </div>
           </dialog>
