@@ -7,7 +7,7 @@ import {
   FaUser,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import Dashboard from "../pages/admin/dashboard";
+// import Dashboard from "../pages/admin/dashboard";
 
 const user = { _id: "123", role: "" };
 
