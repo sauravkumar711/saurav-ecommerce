@@ -90,7 +90,7 @@ export const newProduct = TryCatch(
       return next(new ErrorHandler("Please enter All Fields", 400));
     }
 
-    await Product.create({
+    const product = await Product.create({
       name,
       price,
       stock,
@@ -98,7 +98,7 @@ export const newProduct = TryCatch(
       photos: photo.path,
     });
 
-    await invalidateCache({ product: true });
+    await invalidateCache({ product: true, productId: String(product._id) });
 
     return res.status(201).json({
       success: true,
@@ -130,7 +130,7 @@ export const updateProduct = TryCatch(async (req, res, next) => {
   if (category) product.category = category;
 
   await product.save();
-  await invalidateCache({ product: true });
+  await invalidateCache({ product: true, productId: String(product._id) });
   return res.status(200).json({
     success: true,
     message: "Product updated successfully",
