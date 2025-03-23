@@ -1,6 +1,6 @@
 import { myCache } from "../app.js";
 import { Product } from "../models/product.models.js";
-export const invalidateCache = async ({ product, order, admin, userId, orderId, productId, }) => {
+export const invalidateCache = ({ product, order, admin, userId, orderId, productId, }) => {
     if (product) {
         const productKeys = [
             "latest-products",
@@ -23,7 +23,7 @@ export const invalidateCache = async ({ product, order, admin, userId, orderId, 
         myCache.del(ordersKeys);
     }
     if (admin) {
-        myCache.del("admin-stats");
+        myCache.del(["admin-stats", "admin-pie-charts", "admin-bar-charts", "admin-line-charts"]);
     }
 };
 export const reduceStock = async (orderItems) => {
@@ -37,4 +37,39 @@ export const reduceStock = async (orderItems) => {
         product.stock -= order.quantity;
         await product.save();
     }
+};
+export const calculatePercentage = (thisMonth, lastMonth) => {
+    if (lastMonth === 0)
+        return thisMonth * 100;
+    const percent = (thisMonth / lastMonth) * 100;
+    return Number(percent.toFixed(0));
+};
+export const getInventories = async ({ categories, productsCount, }) => {
+    const categoriesCountPromise = categories.map((category) => Product.countDocuments({ category }));
+    const categoriesCount = await Promise.all(categoriesCountPromise);
+    const categoryCount = [];
+    categories.forEach((category, i) => {
+        categoryCount.push({
+            [category]: Math.round((categoriesCount[i] / productsCount) * 100),
+        });
+    });
+    return categoryCount;
+};
+export const getChartData = ({ length, docArr, today, property }) => {
+    const data = new Array(length).fill(0);
+    docArr.forEach((doc) => {
+        const docDate = new Date(doc.createdAt);
+        const yearDiff = today.getFullYear() - docDate.getFullYear();
+        const monthDiff = today.getMonth() - docDate.getMonth() + yearDiff * 12;
+        if (monthDiff >= 0 && monthDiff < length) {
+            const index = length - monthDiff - 1;
+            if (property && typeof doc[property] === "number") {
+                data[index] += doc[property];
+            }
+            else {
+                data[index]++;
+            }
+        }
+    });
+    return data;
 };
